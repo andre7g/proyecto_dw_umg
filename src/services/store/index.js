@@ -9,6 +9,8 @@ import personaladministrativo from "./personaladministrativo.module";
 import clinica from "./clinica.module";
 import tipopersonal from "./tipopersonal.module";
 import profecion from "./profecion.module";
+import rol from "./rol.module";
+import usuariorol from "./usuariorol.module";
 
 Vue.use(Vuex)
 
@@ -21,6 +23,8 @@ export default new Vuex.Store({
     personaladministrativo,
     clinica,
     tipopersonal,
-    profecion
+    profecion,
+    rol,
+    usuariorol
   }
 });

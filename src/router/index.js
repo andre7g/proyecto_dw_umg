@@ -15,7 +15,8 @@ const router = new Router({
   },
   routes: [
     {
-      path: '/admin',
+      path: '/',
+      redirect: "/Home",
       component: () => import('@/layouts/home/Index.vue'),
       children: [
         {
@@ -34,6 +35,11 @@ const router = new Router({
           component: () => import('@/views/admin/catalogos/usuarios/AdminUsuarios.vue'),
         },
         {
+          path: 'roles',
+          name: 'roles',
+          component: () => import('@/views/admin/catalogos/roles/AdminRoles.vue'),
+        },
+        {
           path: '*',
           name: 'FourOhFour',
           component: () => import('@/views/404/Index.vue'),
@@ -41,29 +47,12 @@ const router = new Router({
       ],
     },
     {
-      path: "/",
+      path: "/login",
+      name: "login",
       component: () => import("@/views/auth/Login.vue"),
-      children: [
-
-        // {
-        //   name: "mlogin",
-        //   path: "/mlogin",
-        //   component: () => import("@/views/auth/Login")
-        // },
-        {
-          path: "login",
-          name: "login",
-          component: () => import("@/views/auth/Login.vue"),
-        },
-        // {
-        //   name: "register",
-        //   path: "/register",
-        //   component: () => import("@/views/auth/Login")
-        // }
-      ]
     },
 
   ],
-})
+});
 
 export default router

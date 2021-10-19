@@ -78,6 +78,9 @@
                                 <v-btn class="ma-2" small tile outlined color="indigo" @click="obtenerDatosItem(item.id)">
                                     <v-icon left>mdi-pencil</v-icon> Cambiar contraseña
                                 </v-btn>
+                                <v-btn class="ma-2" small tile outlined color="indigo" @click="obtenerRolesUsuario(item.id)">
+                                    <v-icon left>mdi-pencil</v-icon> Roles
+                                </v-btn>
                             </td>
                         </tr>
                     </template>
@@ -309,6 +312,112 @@
         </v-card>
     </v-dialog>
     <!-- Fin:: Dialog para mostrar los datos del usuario-->
+    
+    <!-- Inicio:: Dialog para mostrar los datos del usuario-->
+    <v-dialog
+        v-model="dialogRoles"
+        max-width="600px" 
+        persistent 
+        transition="dialog-bottom-transition"
+        
+    >
+        
+        <v-card scrollable>
+            <v-card-title>
+                Agregar Roles 
+                
+                <v-spacer></v-spacer>
+                <v-btn
+                    icon
+                    :disabled="btnRegistroRolesLoading"
+                    @click="dialogRoles = false; resetFormRol()"
+                    class="float-right"
+                >
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
+            </v-card-title>
+            <v-divider></v-divider>
+            <v-card-text class="p-10">
+            <v-form
+                ref="form"
+                v-on:submit.prevent="registrarRolesUsuario"
+                v-model="validFormRoles"
+                >
+                    <v-card flat>
+                        <v-card-text class="p-4">
+                        <SubHeader subHeaderTitle="Seleccionar Rol" />
+                        <v-row>
+                            <v-col cols="12" md="12" sm="12" class="pt-1 pb-1">
+                                <v-select
+                                    v-model="datosUsuarioRoles.roles_Id"
+                                    :items="roles"
+                                    class="required"
+                                    dense
+                                    outlined
+                                    label="Rol"
+                                    item-text="rol"
+                                    item-value="id"
+                                    :rules="[
+                                        selectRequired(
+                                            'Rol'
+                                        )
+                                    ]"
+                                ></v-select>               
+                            </v-col>
+                        </v-row>
+                </v-card-text>
+                <v-divider></v-divider>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                            <v-btn
+                                color="grey lighten-5"
+                                elevation="0"
+                                class="mb-2 float-right grey lighten-5"
+                                @click="dialogRoles = false; resetFormRol()"
+                                :disabled="btnRegistroRolesLoading"
+                            >
+                                Cancelar
+                            </v-btn>
+                            <!--:disabled="!validDocForm" type="submit"-->
+                            <v-btn
+                                color="primary"
+                                class="mb-2 float-right"
+                                type="submit"
+                                :elevation="0" 
+                                :disabled="!validFormRoles" 
+                                :loading="btnRegistroRolesLoading"                         
+                            >
+                                Agregar
+                            </v-btn>
+                </v-card-actions>
+                    </v-card>
+                    </v-form>   
+            </v-card-text>
+        </v-card>
+                <v-card>
+            <v-card-text>
+                <v-container>
+                    <SubHeader :subHeaderTitle="`Roles registrados`" />
+                    <v-data-table
+                        :headers="rolesHeaders"
+                        :items="usuariosRoles"
+                        :items-per-page="10"
+                        :loading="tableUsuarioRolesDocLoading"
+                        class="elevation-1"
+                        no-data-text="No hay roles registrados..."
+                    >
+                        <template v-slot:item="{ item }">
+                            <tr> 
+                                <td>{{ item.roles.rol }}</td>
+                                <td>{{ item.roles.descripcion }}</td>
+                            </tr>
+                        </template>                    
+                    </v-data-table>
+                </v-container>
+            </v-card-text>
+        </v-card>
+    </v-dialog>
+    <!-- Fin:: Dialog para mostrar los datos del usuario-->
 
     <!--Dialog loader -->
     <dialog-loader
@@ -330,7 +439,8 @@ import { OBTENER_USUARIOS,OBTENER_USUARIO,REGISTRAR_USUARIO,ACTUALIZAR_USUARIO }
 import { OBTENER_TIPOS_PERSONAL } from "@/services/store/tipopersonal.module";
 import { OBTENER_PROFECIONES } from "@/services/store/profecion.module";
 import { OBTENER_EMPLEADOS, OBTENER_EMPLEADO } from "@/services/store/personaladministrativo.module";
-
+import { OBTENER_ROLES } from "@/services/store/rol.module";
+import { OBTENER_ROLES_BY_USUARIO,REGISTRAR_ROL_USUARIO } from "@/services/store/usuariorol.module";
 
 import SnackAlert from '@/views/content/SnackAlert.vue';
 import DialogLoader from "@/views/content/DialogLoader";
@@ -350,12 +460,13 @@ export default {
             search:'',
             showPass :false,
             validForm:false,
-            validRolesForm: false,
+            validFormRoles: false,
             cambiarContraseña:false,
             contraseñaText:'Contraseña',
-            tableComponentesLoading:false,
+            tableUsuarioRolesDocLoading:false,
             itemName : "Usuario",
             dialog: false,
+            dialogRoles:false,
             modalTitle: 'Registrar Usuario',
             btnRegistroLoading: false,
             btnRegistroRolesLoading:false,
@@ -369,7 +480,7 @@ export default {
 
             roles:[],
 
-            usuarioRoles:[],
+            usuariosRoles:[],
             switchItemEstado: true,
 
             datosUsuario: {
@@ -378,6 +489,12 @@ export default {
                 password: '',
                 estados_Id: 0,
                 personal_Administrativo_Id: 0
+            },
+            datosUsuarioRoles: {
+                id: 0,
+                usuarios_Id: 0,
+                roles_Id: 0,
+                estados_Id: 1,
             },
             email: '',
             dpi: '',
@@ -415,6 +532,15 @@ export default {
             this.segundo_Apellido= '',
             this.cambiarContraseña = false;
             this.contraseñaText='Contraseña';
+        },
+        resetFormRol(){
+            
+            this.datosUsuarioRoles = {
+                id: 0,
+                usuarios_Id: 0,
+                roles_Id: 0,
+                estados_Id: 1,
+            };
         },
     
 
@@ -470,6 +596,27 @@ export default {
                     
                 });
         },
+        obtenerRoles(){
+            this.roles=[]; 
+            this.$store
+                .dispatch(OBTENER_ROLES,1)
+                .then(() => {
+                    this.roles = this.$store.state.rol.roles;
+                })
+                .catch(error => {
+                });
+        },
+        obtenerRolesByUsuario(){
+            this.usuariosRoles=[]; 
+            this.$store
+                .dispatch(OBTENER_ROLES_BY_USUARIO,this.idUsiario)
+                .then(() => {
+                    this.usuariosRoles = this.$store.state.usuariorol.rolesUsuario;
+                    console.log(this.usuariosRoles);
+                })
+                .catch(error => {
+                });
+        },
         obtenerDatosItem(Id){
             this.dialogLoaderVisible=true;
             this.datosUsuario.id = Id;
@@ -493,7 +640,36 @@ export default {
                     console.log(error)
                 });
         },
-
+        async obtenerRolesUsuario(Id){
+            //console.log(Id);
+            this.dialogLoaderVisible=true;
+            this.idUsiario = Id;
+            await this.obtenerRolesByUsuario();
+            this.dialogRoles = true;
+            this.dialogLoaderVisible=false;
+        },
+        async registrarRolesUsuario(){
+            this.btnRegistroRolesLoading=true;
+            this.datosUsuarioRoles.usuarios_Id = this.idUsiario;
+            await this.$store
+            .dispatch(REGISTRAR_ROL_USUARIO, this.datosUsuarioRoles)
+            .then(res => {
+                if(res.status===200){
+                    this.obtenerRolesByUsuario();
+                    this.dialog=false;
+                    this.$refs.snackalert.SnackbarShow('success', 'Mensaje', res.mensaje);
+                    this.resetFormRol();
+                } else {
+                    this.$refs.snackalert.SnackbarShow('warning', 'Alerta', res.mensaje);
+                }
+                this.btnRegistroRolesLoading=false;
+            })
+            .catch(error => {
+                this.$refs.snackalert.SnackbarShow('warning', 'Alerta', error);
+                this.btnRegistroRolesLoading=false;
+            });
+        },
+        
         async registrarItem(){           
             this.btnRegistroLoading=true;
             this.switchItemEstado ? this.datosUsuario.estados_Id = 1 : this.datosUsuario.estados_Id = 2;
@@ -552,6 +728,7 @@ export default {
     created(){
         this.obtnenerItems();
         this.obtnenerEmpleados();
+        this.obtenerRoles();
     },
 
     
@@ -583,6 +760,18 @@ export default {
                 {
                     text: "Acciones",
                     value: "Acciones"
+                }
+            ]
+        },
+        rolesHeaders() {
+            return [
+                {
+                    text: "Nombre",
+                    value: "rol",
+                },
+                {
+                    text: "Descripción",
+                    value: "descripcion"
                 }
             ]
         }

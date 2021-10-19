@@ -43,6 +43,9 @@
         <v-list-item to="usuarios">
           <v-list-item-title>Usuarios</v-list-item-title>
         </v-list-item>
+        <v-list-item to="roles">
+          <v-list-item-title>Roles</v-list-item-title>
+        </v-list-item>
       </v-list>
 
     </v-menu>
