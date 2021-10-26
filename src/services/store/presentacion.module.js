@@ -2,36 +2,36 @@
 //import axios from "axios";
 import ApiService from "@/services/api.service";
 // action types
-export const OBTENER_PROFECIONES = "obtenerProfeciones";
+export const OBTENER_PRESENTACIONES = "obtenerPresentaciones";
 // mutation types
-export const SET_PROFECIONES = "setProfeciones";
-export const SET_PROFECION = "setProfecion";
+export const SET_PRESENTACIONES = "setPresentaciones";
+export const SET_PRESENTACION = "setPresentacion";
 
 const state = {
-    profeciones: [],
-    profecion:[],
+    presentaciones: [],
+    presentacion:[],
 }
 
 const getters = {
-    obtenerProfeciones(state) {
-      return state.profeciones;
+    obtenerPresentaciones(state) {
+      return state.presentaciones;
     },
 }
 
 const actions = {
-    async [OBTENER_PROFECIONES](context, estadoId) {
+    async [OBTENER_PRESENTACIONES](context, estadoId) {
         /*
         * Si el estado es null va a traer a todos los usuarios, de lo contrario va a traer los usuarios por estado
         *
         */
-        let endpoint = 'api/Profecion';
+        let endpoint = 'api/Presentacion';
         if(estadoId){
-            endpoint = `api/Profecion/GetProfecionActivas/${estadoId}`
+            endpoint = `api/Presentacion/GetPresentacionesActivas/${estadoId}`
         }
         return new Promise(resolve => {
             ApiService.query(`apiconsume/obtener?endpoint=${endpoint}`, '')
                 .then(({ data }) => {
-                    context.commit(SET_PROFECIONES, data.data);
+                    context.commit(SET_PRESENTACIONES, data.data);
                     resolve(data)
                 })
                 .catch((error) => {
@@ -41,12 +41,12 @@ const actions = {
     }
   }
 const mutations = {
-    [SET_PROFECIONES](state, data) {
-        state.profeciones = data;
+    [SET_PRESENTACIONES](state, data) {
+        state.presentaciones = data;
     },
 
-    [SET_PROFECION](state, data) {
-        state.profecion = data;
+    [SET_PRESENTACION](state, data) {
+        state.presentacion = data;
     }
 }
 export default {

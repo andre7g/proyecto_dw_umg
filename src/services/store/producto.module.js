@@ -2,39 +2,39 @@
 //import axios from "axios";
 import ApiService from "@/services/api.service";
 // action types
-export const OBTENER_EMPLEADOS = "obtenerEmpleados";
-export const OBTENER_EMPLEADO = "obtenerEmpleado";
-export const REGISTRAR_EMPLEADO = "registrarEmpleado";
-export const ACTUALIZAR_EMPLEADO = "actualizarEmpleado";
+export const OBTENER_PRODUCTOS = "obtenerProductos";
+export const OBTENER_PRODUCTO = "obtenerProducto";
+export const REGISTRAR_PRODUCTO = "registrarProducto";
+export const ACTUALIZAR_PRODUCTO = "actualizarProducto";
 // mutation types
-export const SET_EMPLEADOS = "setEmpleados";
-export const SET_EMPLEADO = "setCEmpleado";
+export const SET_PRODUCTOS = "setProductos";
+export const SET_PRODUCTO = "setProducto";
 
 const state = {
-    empleados: [],
-    empleado:[],
+    productos: [],
+    producto: [],
 }
 
 const getters = {
-    obtenerEmpleados(state) {
-      return state.empleados;
+    obtenerProductos(state) {
+      return state.productos;
     },
 }
 
 const actions = {
-    async [OBTENER_EMPLEADOS](context, estadoId) {
+    async [OBTENER_PRODUCTOS](context, estadoId) {
         /*
         * Si el estado es null va a traer a todos los usuarios, de lo contrario va a traer los usuarios por estado
         *
         */
-        let endpoint = 'api/Personal_Administrativo';
+        let endpoint = 'api/Productos';
         if(estadoId){
-            endpoint = `api/Personal_Administrativo/GetPersonal_AdministrativoActivos/${estadoId}`
+            endpoint = `api/Productos/GetProductosActivos/${estadoId}`
         }
         return new Promise(resolve => {
             ApiService.query(`apiconsume/obtener?endpoint=${endpoint}`, '')
                 .then(({ data }) => {
-                    context.commit(SET_EMPLEADOS, data.data);
+                    context.commit(SET_PRODUCTOS, data.data);
                     resolve(data)
                 })
                 .catch((error) => {
@@ -42,12 +42,12 @@ const actions = {
                 });
         });       
     },
-    async [OBTENER_EMPLEADO](context, id){
+    async [OBTENER_PRODUCTO](context, id){
         
         return new Promise(resolve => {
-            ApiService.query(`apiconsume/edit/${id}?endpoint=api/Personal_Administrativo/`)
+            ApiService.query(`apiconsume/edit/${id}?endpoint=api/Productos/`)
                 .then(({ data }) => {
-                    context.commit(SET_EMPLEADO, data.data);
+                    context.commit(SET_PRODUCTO, data.data);
                     resolve(data)
                 })
                 .catch((error) => {
@@ -55,11 +55,12 @@ const actions = {
                 });
         });    
     },
-    async [REGISTRAR_EMPLEADO](context, datosEmpleado){
+    async [REGISTRAR_PRODUCTO](context, datosProducto){
+        console.log(datosProducto);
         return new Promise(resolve => {
-            ApiService.post(`apiconsume/create?endpoint=api/Personal_Administrativo`, datosEmpleado)
+            ApiService.post(`apiconsume/create?endpoint=api/Productos`, datosProducto)
                 .then(({ data }) => {
-                    context.commit(SET_EMPLEADO, data.data);
+                    context.commit(SET_PRODUCTO, data.data);
                     resolve(data)
                 })
                 .catch((error) => {
@@ -68,13 +69,13 @@ const actions = {
         });   
     },
 
-    async [ACTUALIZAR_EMPLEADO](context, datosEmpleado){
-        let id = datosEmpleado.id;
+    async [ACTUALIZAR_PRODUCTO](context, datosProducto){
+        let id = datosProducto.id;
         
         return new Promise(resolve => {
-            ApiService.post(`apiconsume/update/${id}?endpoint=api/Personal_Administrativo/UpdatePersonal_Administrativo/`, datosEmpleado)
+            ApiService.post(`apiconsume/update/${id}?endpoint=api/Productos/UpdateProducto/`, datosProducto)
                 .then(({ data }) => {
-                    context.commit(SET_EMPLEADO, data.data);
+                    context.commit(SET_PRODUCTO, data.data);
                     resolve(data)
                 })
                 .catch((error) => {
@@ -84,12 +85,12 @@ const actions = {
     }
   }
 const mutations = {
-    [SET_EMPLEADOS](state, data) {
-        state.empleados = data;
+    [SET_PRODUCTOS](state, data) {
+        state.productos = data;
     },
 
-    [SET_EMPLEADO](state, data) {
-        state.empleado = data;
+    [SET_PRODUCTO](state, data) {
+        state.producto = data;
     }
 }
 export default {

@@ -2,36 +2,36 @@
 //import axios from "axios";
 import ApiService from "@/services/api.service";
 // action types
-export const OBTENER_PROFECIONES = "obtenerProfeciones";
+export const OBTENER_DOSIS = "obtenerDosis";
 // mutation types
-export const SET_PROFECIONES = "setProfeciones";
-export const SET_PROFECION = "setProfecion";
+export const SET_DOSIS = "setDosis";
+export const SET_DOSI = "setDosi";
 
 const state = {
-    profeciones: [],
-    profecion:[],
+    dosis: [],
+    dosi:[],
 }
 
 const getters = {
-    obtenerProfeciones(state) {
-      return state.profeciones;
+    obtenerDosis(state) {
+      return state.dosis;
     },
 }
 
 const actions = {
-    async [OBTENER_PROFECIONES](context, estadoId) {
+    async [OBTENER_DOSIS](context, estadoId) {
         /*
         * Si el estado es null va a traer a todos los usuarios, de lo contrario va a traer los usuarios por estado
         *
         */
-        let endpoint = 'api/Profecion';
+        let endpoint = 'api/Dosis';
         if(estadoId){
-            endpoint = `api/Profecion/GetProfecionActivas/${estadoId}`
+            endpoint = `api/Dosis/GetDosisActivas/${estadoId}`
         }
         return new Promise(resolve => {
             ApiService.query(`apiconsume/obtener?endpoint=${endpoint}`, '')
                 .then(({ data }) => {
-                    context.commit(SET_PROFECIONES, data.data);
+                    context.commit(SET_DOSIS, data.data);
                     resolve(data)
                 })
                 .catch((error) => {
@@ -41,12 +41,12 @@ const actions = {
     }
   }
 const mutations = {
-    [SET_PROFECIONES](state, data) {
-        state.profeciones = data;
+    [SET_DOSIS](state, data) {
+        state.dosis = data;
     },
 
-    [SET_PROFECION](state, data) {
-        state.profecion = data;
+    [SET_DOSI](state, data) {
+        state.dosi = data;
     }
 }
 export default {

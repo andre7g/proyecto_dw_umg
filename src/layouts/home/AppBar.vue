@@ -19,6 +19,7 @@
           optional
           background-color="transparent"
         >
+
           <v-tab
             class="font-weight-bold"
             min-width="96"
@@ -27,11 +28,20 @@
           >
             Catálogos
           </v-tab>
+
           <v-tab
             class="font-weight-bold"
             min-width="96"
+            to="pacientes"
           >
-            Consulta
+            Pacientes
+          </v-tab>
+          <v-tab
+            class="font-weight-bold"
+            min-width="96"
+            to="habitaciones"
+          >
+            Habitaciones
           </v-tab>
         </v-tabs>
       </template>
@@ -46,7 +56,11 @@
         <v-list-item to="roles">
           <v-list-item-title>Roles</v-list-item-title>
         </v-list-item>
+        <v-list-item to="productos">
+          <v-list-item-title>Productos</v-list-item-title>
+        </v-list-item>
       </v-list>
+      
 
     </v-menu>
   </v-row>

@@ -11,6 +11,13 @@ import tipopersonal from "./tipopersonal.module";
 import profecion from "./profecion.module";
 import rol from "./rol.module";
 import usuariorol from "./usuariorol.module";
+import paciente from "./paciente.module";
+import producto from "./producto.module";
+import viaadministracion from "./viaadministracion.module";
+import marca from "./marca.module";
+import dosis from "./dosis.module";
+import presentacion from "./presentacion.module";
+import habitacion from "./habitacion.module";
 
 Vue.use(Vuex)
 
@@ -25,6 +32,13 @@ export default new Vuex.Store({
     tipopersonal,
     profecion,
     rol,
-    usuariorol
+    usuariorol,
+    paciente,
+    producto,
+    viaadministracion,
+    marca,
+    dosis,
+    presentacion,
+    habitacion
   }
 });

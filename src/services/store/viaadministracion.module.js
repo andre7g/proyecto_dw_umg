@@ -2,36 +2,36 @@
 //import axios from "axios";
 import ApiService from "@/services/api.service";
 // action types
-export const OBTENER_PROFECIONES = "obtenerProfeciones";
+export const OBTENER_VIAS_ADMINISTRACION = "obtenerViasAdministracion";
 // mutation types
-export const SET_PROFECIONES = "setProfeciones";
-export const SET_PROFECION = "setProfecion";
+export const SET_VIAS_ADMINISTRACION = "setViasAdministracion";
+export const SET_VIA_ADMINISTRACION = "setViaAdministracion";
 
 const state = {
-    profeciones: [],
-    profecion:[],
+    vias: [],
+    via:[],
 }
 
 const getters = {
-    obtenerProfeciones(state) {
-      return state.profeciones;
+    obtenerViasAdministracion(state) {
+      return state.vias;
     },
 }
 
 const actions = {
-    async [OBTENER_PROFECIONES](context, estadoId) {
+    async [OBTENER_VIAS_ADMINISTRACION](context, estadoId) {
         /*
         * Si el estado es null va a traer a todos los usuarios, de lo contrario va a traer los usuarios por estado
         *
         */
-        let endpoint = 'api/Profecion';
+        let endpoint = 'api/Via_Administracion_Producto';
         if(estadoId){
-            endpoint = `api/Profecion/GetProfecionActivas/${estadoId}`
+            endpoint = `api/Via_Administracion_Producto/GetVias_AdministracionActivas/${estadoId}`
         }
         return new Promise(resolve => {
             ApiService.query(`apiconsume/obtener?endpoint=${endpoint}`, '')
                 .then(({ data }) => {
-                    context.commit(SET_PROFECIONES, data.data);
+                    context.commit(SET_VIAS_ADMINISTRACION, data.data);
                     resolve(data)
                 })
                 .catch((error) => {
@@ -41,12 +41,12 @@ const actions = {
     }
   }
 const mutations = {
-    [SET_PROFECIONES](state, data) {
-        state.profeciones = data;
+    [SET_VIAS_ADMINISTRACION](state, data) {
+        state.vias = data;
     },
 
-    [SET_PROFECION](state, data) {
-        state.profecion = data;
+    [SET_VIA_ADMINISTRACION](state, data) {
+        state.via = data;
     }
 }
 export default {

@@ -2,36 +2,36 @@
 //import axios from "axios";
 import ApiService from "@/services/api.service";
 // action types
-export const OBTENER_PROFECIONES = "obtenerProfeciones";
+export const OBTENER_MARCAS = "obtenerMarcas";
 // mutation types
-export const SET_PROFECIONES = "setProfeciones";
-export const SET_PROFECION = "setProfecion";
+export const SET_MARCAS = "setMarcas";
+export const SET_MARCA = "setMarca";
 
 const state = {
-    profeciones: [],
-    profecion:[],
+    marcas: [],
+    marca:[],
 }
 
 const getters = {
-    obtenerProfeciones(state) {
-      return state.profeciones;
+    obtenerMarcas(state) {
+      return state.marcas;
     },
 }
 
 const actions = {
-    async [OBTENER_PROFECIONES](context, estadoId) {
+    async [OBTENER_MARCAS](context, estadoId) {
         /*
         * Si el estado es null va a traer a todos los usuarios, de lo contrario va a traer los usuarios por estado
         *
         */
-        let endpoint = 'api/Profecion';
+        let endpoint = 'api/Marca';
         if(estadoId){
-            endpoint = `api/Profecion/GetProfecionActivas/${estadoId}`
+            endpoint = `api/Marca/GetMarcasActivas/${estadoId}`
         }
         return new Promise(resolve => {
             ApiService.query(`apiconsume/obtener?endpoint=${endpoint}`, '')
                 .then(({ data }) => {
-                    context.commit(SET_PROFECIONES, data.data);
+                    context.commit(SET_MARCAS, data.data);
                     resolve(data)
                 })
                 .catch((error) => {
@@ -41,12 +41,12 @@ const actions = {
     }
   }
 const mutations = {
-    [SET_PROFECIONES](state, data) {
-        state.profeciones = data;
+    [SET_MARCAS](state, data) {
+        state.marcas = data;
     },
 
-    [SET_PROFECION](state, data) {
-        state.profecion = data;
+    [SET_MARCA](state, data) {
+        state.marca = data;
     }
 }
 export default {

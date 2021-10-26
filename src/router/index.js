@@ -40,6 +40,21 @@ const router = new Router({
           component: () => import('@/views/admin/catalogos/roles/AdminRoles.vue'),
         },
         {
+          path: 'pacientes',
+          name: 'pacientes',
+          component: () => import('@/views/admin/catalogos/pacientes/AdminPacientes.vue'),
+        },
+        {
+          path: 'productos',
+          name: 'productos',
+          component: () => import('@/views/admin/catalogos/productos/AdminProductos.vue'),
+        },
+        {
+          path: 'habitaciones',
+          name: 'habitaciones',
+          component: () => import('@/views/admin/habitaciones/AdminHabitaciones.vue'),
+        },
+        {
           path: '*',
           name: 'FourOhFour',
           component: () => import('@/views/404/Index.vue'),

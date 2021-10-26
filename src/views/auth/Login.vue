@@ -4,16 +4,15 @@
                     <v-col cols="12" xs="12" sm="12" md="4"></v-col>
                     <v-col cols="12" xs="12" sm="12" md="4">
                         <v-card
-                          max-width="500"
+                          max-width="600"
                           style="background-color: #F5F5F5;color: #283593"
-                          class="font-weight-bold"
                         >
 
                           <v-divider class="mx-4"></v-divider>
                           <v-row style="margin-top: 10px">
                             <v-col cols="12" xs="12" sm="12" md="4"></v-col>
                             <v-col cols="12" xs="12" sm="12" md="4">
-                                <h2 class="font-weight-bold d-flex justify-space-between text-caption">Bienvenido</h2>
+                                <h2>Bienvenido</h2>
                             </v-col>
                           </v-row>
                           <v-card-text>
@@ -23,12 +22,11 @@
                                       v-on:submit.prevent="login"
                                       v-model="validForm"
                                       >
-                                          <v-card flat style="background-color: #F5F5F5;color: white" class="font-weight-bold">
+                                          <v-card flat style="background-color: #F5F5F5;color: white">
                                               <v-card-text>
                                           <v-row>
-                                              <v-col cols="12" md="12" sm="12" xs="12" class="pt-1 pb-1">
+                                              <v-col cols="12" md="12" sm="12" xs="12">
                                                   <v-text-field
-                                                      outlined
                                                       autocomplete="off"
                                                       class="required"
                                                       dense
@@ -43,7 +41,7 @@
                                               </v-col>
                                               <v-col cols="12" md="12" sm="12" xs="12" class="pt-1 pb-1">
                                                 <v-text-field
-                                                    outlined
+                                  
                                                     dense
                                                     :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
                                                     :rules="[
@@ -69,7 +67,6 @@
                                                       depressed
                                                       elevation="2"
                                                       large
-                                                      
                                                       rounded
                                                       class="mb-2 block red darken-1"
                                                       style="background-color: #283593;color: white"
@@ -102,7 +99,10 @@
 <!-- Load login custom page styles -->
 
 <style lang="scss">
-
+body {
+    font-family:Vegur, 'PT Sans', Verdana, sans-serif;
+    font-weight:bolder;
+}
 </style>
 
 <script>
