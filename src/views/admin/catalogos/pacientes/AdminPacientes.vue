@@ -79,6 +79,9 @@
                                 <v-btn class="ma-2" small tile outlined color="indigo" @click="obtenerDatosItem(item.id)">
                                     <v-icon left>mdi-pencil</v-icon> Actualizar
                                 </v-btn>
+                                <v-btn class="ma-2" small tile outlined color="indigo" @click="obtenerHistorial(item.id)">
+                                    <v-icon left>mdi-pencil</v-icon> Historial Medico
+                                </v-btn>
                             </td>
                         </tr>
                     </template>
@@ -466,7 +469,184 @@
 
 
     <!-- Fin:: Dialog para mostrar los datos del empleado-->
+    <!-- Inicio:: Dialog para mostrar los datos de la etnia-->
+    <v-dialog
+        v-model="dialogHistorial"
+        max-width="1200px" 
+        persistent 
+        transition="dialog-bottom-transition"
+        
+    >
+        
+        <v-card scrollable>
+            <v-card-title>
+                Historial Medico
+                
+                <v-spacer></v-spacer>
+                <v-btn
+                    icon
+                    :disabled="btnRegistroLoading"
+                    @click="dialogHistorial = false; resetForm()"
+                    class="float-right"
+                >
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
+            </v-card-title>
+            <v-divider></v-divider>
+            <v-card-text class="p-10">
+                                   <v-tabs v-model="activeTab">
+                    <v-tab key='Consultas'>
+                        <v-icon left>
+                        mdi-file-document-edit-outline
+                        </v-icon>
+                        Consultas
+                    </v-tab>
+                    
+                    <v-tab key='Diagnosticos'>
+                        <v-icon left>
+                        mdi-account-box-outline
+                        </v-icon>
+                        Diagnosticos
+                    </v-tab>
 
+                    <v-tab key='Diagnosticos'>
+                    <v-icon left>
+                                mdi-account-box-outline
+                                </v-icon>
+                                Examenes
+                            </v-tab>
+                    <v-tab-item>
+                    <v-card :elevation="0">
+                        <v-card-title>
+                            <v-row class="col-md-12">
+                                <v-col cols="12" sm="12" md="6" class="font-weight-black">
+                                    Consultas del paciente
+                                </v-col>
+                            </v-row>
+                            <v-row class="col-md-12 m-0 p-0">
+                                <v-divider></v-divider>
+                            </v-row>
+                            <v-row>
+                                <v-col cols="12" sm="12" md="8"></v-col>
+                                <v-col cols="12" sm="12" md="4">
+                                    <v-spacer></v-spacer>
+                                    <v-text-field
+                                        v-model="search"
+                                        append-icon="mdi-magnify"
+                                        label="Buscar"
+                                        single-line
+                                        hide-details
+                                    ></v-text-field>
+                                </v-col>
+                            </v-row>
+                        </v-card-title>
+
+                        <v-card-text>
+                            <v-data-table
+                                    :headers="headersConsulta"
+                                    :items="consultas"
+                                    :search="search"
+                                    item-key="Id"
+                                    class="elevation-0"
+                                    :loading="tableLoading"
+                                    no-data-text="No hay datos para mostrar"
+                                    :footer-props="{
+                                        showFirstLastPage: true,
+                                        firstIcon: 'mdi-page-first',
+                                        lastIcon: 'mdi-page-last',
+                                        prevIcon: 'mdi-chevron-left',
+                                        nextIcon: 'mdi-chevron-right',
+                                        'items-per-page-text':'Registros por página',
+                                        pageText: '{0}-{1} de {2}' 
+                                    }"
+                                    :items-per-page="10"
+                                    dense
+                                >
+                                <template v-slot:item="{ item }">
+                                    <tr>
+                                        <td>{{ item.id }}</td>
+                                        <td>{{ item.fecha }}</td>
+                                        <td>{{ item.empleado }}</td>
+                                    </tr>
+                                </template>
+
+                            </v-data-table>
+                        </v-card-text>
+                    </v-card>
+                    </v-tab-item>
+                    <v-tab-item>
+                                            <v-card :elevation="0">
+                        <v-card-title>
+                            <v-row class="col-md-12">
+                                <v-col cols="12" sm="12" md="6" class="font-weight-black">
+                                    Consultas del paciente
+                                </v-col>
+                            </v-row>
+                            <v-row class="col-md-12 m-0 p-0">
+                                <v-divider></v-divider>
+                            </v-row>
+                            <v-row>
+                                <v-col cols="12" sm="12" md="8"></v-col>
+                                <v-col cols="12" sm="12" md="4">
+                                    <v-spacer></v-spacer>
+                                    <v-text-field
+                                        v-model="search"
+                                        append-icon="mdi-magnify"
+                                        label="Buscar"
+                                        single-line
+                                        hide-details
+                                    ></v-text-field>
+                                </v-col>
+                            </v-row>
+                        </v-card-title>
+
+                        <v-card-text>
+                            <v-data-table
+                                    :headers="headersDiagnosticos"
+                                    :items="diagnosticos"
+                                    :search="search"
+                                    item-key="Id"
+                                    class="elevation-0"
+                                    :loading="tableLoading"
+                                    no-data-text="No hay datos para mostrar"
+                                    :footer-props="{
+                                        showFirstLastPage: true,
+                                        firstIcon: 'mdi-page-first',
+                                        lastIcon: 'mdi-page-last',
+                                        prevIcon: 'mdi-chevron-left',
+                                        nextIcon: 'mdi-chevron-right',
+                                        'items-per-page-text':'Registros por página',
+                                        pageText: '{0}-{1} de {2}' 
+                                    }"
+                                    :items-per-page="10"
+                                    dense
+                                >
+                                <template v-slot:item="{ item }">
+                                    <tr>
+                                        <td>{{ item.id }}</td>
+                                        <td>{{ item.fecha }}</td>
+                                        <td>{{ item.diagnositco }}</td>
+                                        <td>{{ item.empleado }}</td>
+                                    </tr>
+                                </template>
+
+                            </v-data-table>
+                        </v-card-text>
+                    </v-card>
+                    </v-tab-item>
+                    <v-tab-item>
+
+                    </v-tab-item>
+
+               
+            </v-tabs>
+            <!--End:: v-tabs-->
+            </v-card-text>
+        </v-card>
+    </v-dialog>
+
+
+    <!-- Fin:: Dialog para mostrar los datos del empleado-->
     <!--Dialog loader -->
     <dialog-loader
         :dialogVisible="dialogLoaderVisible"
@@ -506,6 +686,7 @@ export default {
             validRolesForm: false,
             itemName : "Paciente",
             dialog: false,
+            dialogHistorial: false,
             modalTitle: 'Registrar Paciente',
             btnRegistroLoading: false,
 
@@ -539,11 +720,40 @@ export default {
                 dpi: 0,
                 email: '',
             },
+            consultas:[
+                {
+                    id:1,
+                    fecha:'20/10/2021',
+                    empleado:'Diego Rene Santizo Santizo'
+                },
+                {
+                    id:2,
+                    fecha:'25/10/2021',
+                    empleado:'Diego Rene Santizo Santizo'
+                },
+            ],
+            diagnosticos:[
+                {
+                    id:1,
+                    fecha:'20/10/2021',
+                    diagnositco:'Peritonitis',
+                    empleado:'Diego Rene Santizo Santizo'
+                },
+                {
+                    id:2,
+                    fecha:'25/10/2021',
+                    diagnositco:'Emorragia interna',
+                    empleado:'Diego Rene Santizo Santizo'
+                },
+            ],
             tableLoading: false,
             ...validations
         } 
     }, 
     methods: {
+        obtenerHistorial(){
+            this.dialogHistorial = true;
+        },
         maxDate() {
             const date = new Date();
             date.setFullYear(date.getFullYear() - 18);
@@ -734,6 +944,46 @@ export default {
                 {
                     text: "Acciones",
                     value: "Acciones"
+                }
+            ]
+        },
+        headersConsulta() {
+            return [
+                {
+                    text: "Id",
+                    align: "start",
+                    sortable: true,
+                    value: "id"
+                },
+                {
+                    text: "Fecha",
+                    value: "fecha",
+                },
+                {
+                    text: "Personal Administrativo",
+                    value: "empleado",
+                }
+            ]
+        },
+        headersDiagnosticos() {
+            return [
+                {
+                    text: "Id",
+                    align: "start",
+                    sortable: true,
+                    value: "id"
+                },
+                {
+                    text: "Fecha",
+                    value: "fecha",
+                },
+                {
+                    text: "Diagnostico",
+                    value: "diagnositco",
+                },
+                {
+                    text: "Personal Administrativo",
+                    value: "empleado",
                 }
             ]
         },

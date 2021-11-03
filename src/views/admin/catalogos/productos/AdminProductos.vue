@@ -119,7 +119,7 @@
             <v-card-text class="p-10">
             <v-form
                 ref="form"
-                v-on:submit.prevent="registrarItem"
+                v-on:submit.prevent="registrarMedicamento"
                 v-model="validForm"
                 >
                     <v-card flat>
@@ -165,7 +165,7 @@
                                     ),
                                     maxLength(
                                         'Descripción',
-                                        45
+                                        2000
                                     )
                                 ]"
                             ></v-text-field>
@@ -248,6 +248,148 @@
                         </v-col>
                     </v-row>
                     <v-row>
+                        <v-col cols="12" md="6" sm="12" class="pt-1 pb-1">
+                            <v-autocomplete
+                                v-model="datosMedicamento.funcion_medicamento_Id"
+                                :items="funciones"
+                                class="required"
+                                dense
+                                outlined
+                                label="Uso"
+                                item-text="nombre"
+                                item-value="id"
+                                :rules="[
+                                    selectRequired(
+                                        'Uso'
+                                    )
+                                ]"
+                            
+                            ></v-autocomplete>               
+                        </v-col>
+                        <v-col  md="6" sm="12" class="pt-1 pb-1">
+                            <v-text-field
+                                outlined
+                                autocomplete="off"
+                                class="required"
+                                dense
+                                v-model="datosMedicamento.precio"
+                                label="Precio"
+                                :rules="[
+                                    required(
+                                        'Precio'
+                                    ),
+                                    maxNumber(
+                                        'Precio',
+                                        45
+                                    ),
+                                    onlyDecimal(
+                                        'Precio'
+                                    )
+                                ]"
+                            ></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="accion===1">
+                        <v-col cols="6">
+                            <template>
+                            <v-file-input
+                                id="docFile"
+                                v-model="docFile"
+                                color="deep-purple accent-4"
+                                counter
+                                class="required"
+                                dense
+                                ref="docFile"
+                                label="Seleccionar documento"
+                                placeholder="Seleccione el archivo"
+                                append-icon="mdi-paperclip"
+                                prepend-icon=""
+                                outlined
+                                :rules="[fileRequired('Documento')]"
+                                :show-size="1000"
+                                accept=".jpg,.png"
+                                @change="onFileChange"
+                                
+                                
+                            >
+                                <template v-slot:selection="{ index, text }">
+                                <v-chip
+                                    v-if="index < 2"
+                                    color="deep-purple accent-4"
+                                    dark
+                                    label
+                                    small
+                                >
+                                    {{ text }}
+                                </v-chip>
+
+                                <span
+                                    v-else-if="index === 2"
+                                    class="text-overline grey--text text--darken-3 mx-2"
+                                >
+                                    +{{ files.length - 2 }} archivo(s)
+                                </span>
+                                </template>
+                            </v-file-input>
+                            </template>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="accion===2">
+                        <v-col cols="6">
+                            <template>
+                            <v-file-input
+                                id="docFile"
+                                v-model="docFile"
+                                color="deep-purple accent-4"
+                                counter
+                                class="required"
+                                dense
+                                ref="docFile"
+                                label="Seleccionar documento"
+                                placeholder="Seleccione el archivo"
+                                append-icon="mdi-paperclip"
+                                prepend-icon=""
+                                outlined
+                                :rules="[]"
+                                :show-size="1000"
+                                accept=".jpg,.png"
+                                @change="onFileChange"
+                                
+                                
+                            >
+                                <template v-slot:selection="{ index, text }">
+                                <v-chip
+                                    v-if="index < 2"
+                                    color="deep-purple accent-4"
+                                    dark
+                                    label
+                                    small
+                                >
+                                    {{ text }}
+                                </v-chip>
+
+                                <span
+                                    v-else-if="index === 2"
+                                    class="text-overline grey--text text--darken-3 mx-2"
+                                >
+                                    +{{ files.length - 2 }} archivo(s)
+                                </span>
+                                </template>
+                            </v-file-input>
+                            </template>
+                        </v-col>
+                        <v-col md="6" sm="12" class="pt-1 pb-1">
+                            <v-card
+                            max-width="200"
+                              class="mx-auto"
+                              tile
+                            >
+                                <v-img :src="pathImagen"></v-img>
+                            </v-card>
+
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col  md="12" sm="12" class="pt-1 pb-1">
                              <label class="grey--text body-2">Estado</label>
                                 <v-switch
@@ -313,7 +455,9 @@ import { OBTENER_VIAS_ADMINISTRACION } from "@/services/store/viaadministracion.
 import { OBTENER_MARCAS } from "@/services/store/marca.module";
 import { OBTENER_DOSIS } from "@/services/store/dosis.module";
 import { OBTENER_PRESENTACIONES } from "@/services/store/presentacion.module";
+import { OBTENER_FUNCIONES_MFEDICAMENTO } from "@/services/store/funcionmedicamento.module";
 
+import { CARGAR_ARCHIVO } from "@/services/store/cargararchivo.module";
 
 import SnackAlert from '@/views/content/SnackAlert.vue';
 import DialogLoader from "@/views/content/DialogLoader";
@@ -346,6 +490,7 @@ export default {
             marcas:[],
             dosis:[],
             presentaciones:[],
+            funciones:[],
             switchItemEstado: true,
 
             datosMedicamento: {
@@ -356,10 +501,17 @@ export default {
                 via_Administracion_Producto_Id: 0,
                 marca_Id: 0,
                 dosis_Id: 0,
-                presentacion_Id: 0
+                presentacion_Id: 0,
+                path:'',
+                precio:'',
+                funcion_medicamento_Id:0
             },
             tableLoading: false,
-            ...validations
+
+            docFile: null,
+            archivoCargado: false,
+            pathImagen:'',
+            ...validations,
         } 
     }, 
     methods: {
@@ -371,7 +523,12 @@ export default {
         },
 
         resetForm(){
-            
+            if(document.querySelector('#docFile').value !== ''){
+                this.$refs.docFile.reset();
+                document.querySelector('#docFile').value = '';
+            }
+            this.docFile = null;
+
             this.datosMedicamento = {
                 id: 0,
                 nombre: '',
@@ -380,9 +537,12 @@ export default {
                 via_Administracion_Producto_Id: 0,
                 marca_Id: 0,
                 dosis_Id: 0,
-                presentacion_Id: 0
+                presentacion_Id: 0,
+                path:'',
+                precio:'',
+                funcion_medicamento_Id:0
             };
-
+            this.pathImagen='',
             this.switchItemEstado = true;
         },
     
@@ -454,6 +614,18 @@ export default {
             })
             .catch(() => {});
         },
+        //Obtener funcion del medicamento
+        async obtenerFuncionesMedicamento(){
+            this.funciones=[];
+            await this.$store
+            .dispatch(OBTENER_FUNCIONES_MFEDICAMENTO,1)
+            .then(res => {
+                if(res.status === 200){
+                    this.funciones = this.$store.state.funcionmedicamento.funcionesMedicamento  
+                }        
+            })
+            .catch(() => {});
+        },
         obtenerDatosItem(Id){
             this.dialogLoaderVisible=true;
             this.datosMedicamento.id = Id;
@@ -465,8 +637,8 @@ export default {
                 .dispatch(OBTENER_PRODUCTO, Id)
                 .then(() => {
                     this.datosMedicamento = this.$store.state.producto.producto;
+                    this.pathImagen=`http://127.0.0.1:17157${this.datosMedicamento.path}`,
                     this.datosMedicamento.estados_Id === 1 ? this.switchItemEstado = true : this.switchItemEstado = false;
-
                     this.dialog = true;
                     this.dialogLoaderVisible = false;
                 })
@@ -475,7 +647,56 @@ export default {
                     console.log(error)
                 });
         },
+        //!Metodo que llama a cargar imagen (carga en el servidor) para luego almacenar el registro en el api
+        registrarMedicamento(){
+            if(this.docFile !== null){
+                //console.log('si entra en el if');
+                this.cargarImagen()
+                .then(()=>{
+                    //?Validar que el archivo fue cargado
+                    if(this.archivoCargado){
+                        this.registrarItem();
+                    }
+                })
+                .catch(() => {
+                    this.btnRegistroLoading=false;
+                }); 
 
+            }else{
+                if(this.accion === 1){
+                    delete this.datosProducto.pathDocumento;
+                }
+                //console.log('no entra en el if');
+                this.registrarItem();
+
+            }
+        },
+        //!Almacenar la imagen
+        async cargarImagen(){
+            const doc = this.docFile;
+            console.log(doc);
+            this.btnRegistroLoading = true;
+                await this.$store
+                    .dispatch(CARGAR_ARCHIVO, {file: doc, path: `\\documentos\\medicamentos\\`})
+                    .then(res => {
+                        //!Si se almacenó el archivo correctamente, cambiar el valor de arhivoCargado a true.
+                        if(res.status===200){
+                            
+                            this.datosMedicamento.path = res.pathArchivo;
+                            this.archivoCargado =true;
+                            return true;
+                        } else {
+                            this.$refs.snackalert.SnackbarShow('warning', 'Alerta', `Ha ocurrido un error durante la carga de imagen.`);
+                            this.archivoCargado =false;
+                        }
+                    })
+                    .catch(err => {
+                        this.$refs.snackalert.SnackbarShow('warning', 'Alerta', `Ha ocurrido un error, por favor ponte en contacto con un adminisrador del sistema. ${err}`);
+                        this.btnRegistroLoading=false;
+                        this.dialogLoaderVisible=false;
+                        return false;
+                    });            
+        },
         async registrarItem(){           
             this.btnRegistroLoading=true;
             this.switchItemEstado ? this.datosMedicamento.estados_Id = 1 : this.datosMedicamento.estados_Id = 2;
@@ -520,7 +741,36 @@ export default {
                     this.btnRegistroLoading=false;
                 });
             }
-        }
+        },
+                //!Asignar el archivo
+        onFileChange(e){
+            //this.docFile = e
+            if(e){
+                console.log(e.type);
+                //!?Validar que el tipo de archivo sea pdf
+                //console.log(e.type);
+                if (e.type != "image/jpeg" && e.type != "image/png"){
+                    // Api call
+                    this.$refs.snackalert.SnackbarShow('warning', 'Alerta', `El archivo que desea ingresar no es válido.`);
+                    //console.log("no es un pdf..")
+                    //this.$refs.file.reset();
+                    document.querySelector('#docFile').value = '';
+                    this.$refs.docFile.reset();
+                    return false;
+                }
+                //?Validar que el tamaó del archivo no exceda los 5Mb
+                if ((e.size/1024/1024) > 5){
+                    this.$refs.snackalert.SnackbarShow('warning', 'Alerta', `El tamaño del archivo excede el límite permitido (5Mb)`);
+                    // this.$refs.file.reset();
+                    document.querySelector('#docFile').value = '';
+                    this.$refs.docFile.reset();
+                    return false;
+                }
+                this.docFile = e;
+             
+            }
+            return false; // return false will not automatically upload
+        },
     },
     mounted() {
         //Definir el nombre en el breadcrumb
@@ -537,6 +787,7 @@ export default {
         this.obtenerMarcas();
         this.obtenerDosis();
         this.obtenerPresentaciones();
+        this.obtenerFuncionesMedicamento();
     },
 
     

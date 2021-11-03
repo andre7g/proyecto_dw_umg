@@ -130,7 +130,7 @@
                                 autocomplete="off"
                                 class="required"
                                 dense
-                                v-model="datosMedicamento.nombre"
+                                v-model="datosHabitacionPaciente.nombre"
                                 label="Nombre"
                                 :rules="[
                                     required(
@@ -155,7 +155,7 @@
                                 autocomplete="off"
                                 class="required"
                                 dense
-                                v-model="datosMedicamento.descripcion"
+                                v-model="datosHabitacionPaciente.descripcion"
                                 label="Descripción"
                                 :rules="[
                                     required(
@@ -242,7 +242,7 @@
             <v-card-text class="p-10">
             <v-form
                 ref="form"
-                v-on:submit.prevent="entregarHabitacion"
+                v-on:submit.prevent="registrarHabitacionPaciente"
                 v-model="validFormEntrega"
                 >
                     <v-card flat>
@@ -251,9 +251,10 @@
                     <v-row>
                         <v-col cols="12" md="12" sm="12" class="pt-1 pb-1">
                             <v-autocomplete
-                                v-model="datosMedicamento.presentacion_Id"
+                                v-model="datosHabitacionPaciente.paciente_Id"
                                 :items="pacientes"
                                 class="required"
+                                :disabled="accion === 2"
                                 dense
                                 outlined
                                 label="Seleccione el paciente"
@@ -322,6 +323,7 @@ import moment from "moment";
 import { SET_BREADCRUMB } from "@/services/store/breadcrumbs.module";
 import { OBTENER_HABITACIONES,REGISTRAR_PRODUCTO,OBTENER_PRODUCTO,ACTUALIZAR_PRODUCTO } from "@/services/store/habitacion.module";
 import { OBTENER_PACIENTES } from "@/services/store/paciente.module";
+import { REGISTRAR_HABITACION_PACIENTE,OBTENER_HABITACIONES_PACIENTE,OBTENER_HABITACION_PACIENTE,ACTUALIZAR_HABITACION_PACIENTE } from "@/services/store/habitacionpaciente.module";
 
 
 import SnackAlert from '@/views/content/SnackAlert.vue';
@@ -330,7 +332,7 @@ import SubHeader from "@/views/components/SubHeader";
 
 
 export default {
-    name: "AdminMedicamentos",
+    name: "AdminHabitaciones",
     components: {
         "dialog-loader": DialogLoader,
         SnackAlert,
@@ -356,19 +358,16 @@ export default {
             accion: 1,
             habitaciones: [],
             pacientes:[],
+            habitacionesPaciente:[],
             switchItemEstado: true,
-
-            datosMedicamento: {
+            datosHabitacionPaciente: {
                 id: 0,
-                nombre: '',
-                descripcion: '',
-                estados_Id: 0,
-                via_Administracion_Producto_Id: 0,
-                marca_Id: 0,
-                dosis_Id: 0,
-                presentacion_Id: 0
+                habitacion_Id: 0,
+                paciente_Id: 0,
+                estados_Id: 1
             },
             tableLoading: false,
+            habitacionPacienteId:0,
             ...validations
         } 
     }, 
@@ -382,17 +381,13 @@ export default {
 
         resetForm(){
             
-            this.datosMedicamento = {
+            this.datosHabitacionPaciente = {
                 id: 0,
-                nombre: '',
-                descripcion: '',
-                estados_Id: 0,
-                via_Administracion_Producto_Id: 0,
-                marca_Id: 0,
-                dosis_Id: 0,
-                presentacion_Id: 0
+                habitacion_Id: 0,
+                paciente_Id: 0,
+                estados_Id: 1
             };
-
+            this.accion = 1;
             this.switchItemEstado = true;
         },
     
@@ -431,18 +426,18 @@ export default {
         },
         obtenerDatosItem(Id){
             this.dialogLoaderVisible=true;
-            this.datosMedicamento.id = Id;
+            this.datosHabitacionPaciente.id = Id;
+            this.idHabitacion = Id;
             this.accion=2;
-            this.modalTitle='Actualizar Medicamento';
-            this.btnRegistroText='Actualizar Medicamento';
-
+            this.btnRegistroHabitacionText = 'Recibir';
+            this.modalHabitacionTitle = 'Recibir Habitación';
             this.$store
-                .dispatch(OBTENER_PRODUCTO, Id)
-                .then(() => {
-                    this.datosMedicamento = this.$store.state.producto.producto;
-                    this.datosMedicamento.estados_Id === 1 ? this.switchItemEstado = true : this.switchItemEstado = false;
-
-                    this.dialog = true;
+                .dispatch(OBTENER_HABITACIONES_PACIENTE, Id)
+                .then(res => {
+                    this.habitacionesPaciente = this.$store.state.habitacionpaciente.habitacionesPaciente;
+                    this.datosHabitacionPaciente.paciente_Id = this.habitacionesPaciente[0].paciente_Id;
+                    this.obtenerDatosHabitacionPaciente(this.habitacionesPaciente[0].id);
+                    this.dialogEntrgaHabitacion = true;
                     this.dialogLoaderVisible = false;
                 })
                 .catch(error => {
@@ -450,18 +445,32 @@ export default {
                     console.log(error)
                 });
         },
+        obtenerDatosHabitacionPaciente(Id){
+            this.$store
+                .dispatch(OBTENER_HABITACION_PACIENTE, Id)
+                .then(res => {
+                    this.datosHabitacionPaciente = this.$store.state.habitacionpaciente.habitacionPaciente;
+                    console.log(this.datosHabitacionPaciente);
+                })
+                .catch(error => {
+                    this.dialogLoaderVisible = false;
+                    console.log(error)
+                });
+        },
         entregarHabitacion(idHabitacion){
+                        this.btnRegistroHabitacionText = 'Entregar';
+            this.modalHabitacionTitle = 'Entregar Habitación';
             this.idHabitacion = idHabitacion;
             this.dialogEntrgaHabitacion = true;
 
         },
-        async registrarItem(){           
-            this.btnRegistroLoading=true;
-            this.switchItemEstado ? this.datosMedicamento.estados_Id = 1 : this.datosMedicamento.estados_Id = 2;
+        async registrarHabitacionPaciente(){           
+            this.btnRegistroHabitacionLoading = true;
+            this.datosHabitacionPaciente.habitacion_Id = this.idHabitacion;
             if(this.accion===1){
-                this.datosMedicamento.id = 0;
-                await this.$store
-                    .dispatch(REGISTRAR_PRODUCTO, this.datosMedicamento)
+                this.datosHabitacionPaciente.id = 0;
+                 await this.$store
+                    .dispatch(REGISTRAR_HABITACION_PACIENTE, this.datosHabitacionPaciente)
                     .then(res => {
                         //console.log(res)
                         if(res.status===200){
@@ -473,15 +482,16 @@ export default {
                         } else {
                             this.$refs.snackalert.SnackbarShow('warning', 'Alerta', res.mensaje);
                         }
-                        this.btnRegistroLoading=false;
+                        this.btnRegistroHabitacionLoading=false;
+                        this.dialogEntrgaHabitacion = false;
                     })
                     .catch(error => {
                         this.$refs.snackalert.SnackbarShow('warning', 'Alerta', error);
-                        this.btnRegistroLoading=false;
+                        this.btnRegistroHabitacionLoading=false;
                     });
             } else {
                 await this.$store
-                .dispatch(ACTUALIZAR_PRODUCTO, this.datosMedicamento)
+                .dispatch(ACTUALIZAR_HABITACION_PACIENTE, this.datosHabitacionPaciente)
                 .then(res => {
                     if(res.status===200){                            
                         this.obtnenerItems();
@@ -492,11 +502,12 @@ export default {
                     } else {
                         this.$refs.snackalert.SnackbarShow('warning', 'Alerta', res.mensaje);
                     }
-                    this.btnRegistroLoading=false;
+                    this.btnRegistroHabitacionLoading=false;
+                    this.dialogEntrgaHabitacion = false;
                 })
                 .catch(error => {
                     this.$refs.snackalert.SnackbarShow('warning', 'Alerta', error);
-                    this.btnRegistroLoading=false;
+                    this.btnRegistroHabitacionLoading=false;
                 });
             }
         }

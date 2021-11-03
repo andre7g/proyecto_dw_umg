@@ -22,6 +22,7 @@ const ApiService = {
   },
 
   query(resource, params) {
+    console.log(resource);
     return Vue.axios.get(resource, params).catch(error => {
       // console.log(error);
       throw new Error(`[KT] ApiService ${error}`);

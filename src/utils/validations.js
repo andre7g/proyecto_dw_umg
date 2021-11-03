@@ -36,7 +36,7 @@ let onlyInteger = propertyType => {
   return v => /[0-9]$/.test(v) || `Para el campo ${propertyType} Debe de ingresar un números enteros`;
 };
 let onlyDecimal = propertyType => {
-  return v => !/[^0-9.]$/.test(v) || `${propertyType} Debe de ingresar un número entero o decimal.`;
+  return v => /^[0-9]+([.])?([0-9]+)?$/.test(v) || `${propertyType} Debe de ingresar un número entero o decimal.`;
 };
 
 let minNumber = (propertyType, min) => {

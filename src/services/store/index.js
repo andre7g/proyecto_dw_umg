@@ -18,6 +18,9 @@ import marca from "./marca.module";
 import dosis from "./dosis.module";
 import presentacion from "./presentacion.module";
 import habitacion from "./habitacion.module";
+import habitacionpaciente from "./habitacionpaciente.module";
+import funcionmedicamento from "./funcionmedicamento.module";
+import cargararchivo from "./cargararchivo.module";
 
 Vue.use(Vuex)
 
@@ -39,6 +42,9 @@ export default new Vuex.Store({
     marca,
     dosis,
     presentacion,
-    habitacion
+    habitacion,
+    habitacionpaciente,
+    funcionmedicamento,
+    cargararchivo
   }
 });
